@@ -1,0 +1,82 @@
+{
+  "FileDetails": {
+    "Version": "1.0",
+    "UniqueID": "f99eef73-56b3-4b5b-85ca-1c5a44f5c9a7"
+  },
+  "ListDetails": {
+    "Name": "The High Republic",
+    "Description": "",
+    "Publisher": "Marvel",
+    "Imprint": "Max - ### UNSURE OF THIS ONE?? ###",
+    "StartYear": 2021,
+    "EndYear": 2023,
+    "Type": "Interuniversal, Universal, Team, Character, Story, Master",
+    "Associated": {
+      "Characters": ["Spider-Man", "Captain America"],
+      "Teams": ["Avengers", "X-Men"]
+    },
+    "CoverImageURLs": ["http://URL1", "http://URL2"],
+    "Relationships": {
+      "Previous": {
+        "Name": "List Name",
+        "ID": "List UUID"
+      },
+      "Following": {
+        "Name": "List Name",
+        "ID": "List UUID"
+      }
+    },
+    "Source": [
+      {
+        "Name": "Marvel",
+        "URL": ""
+      },
+      {
+        "Name": "Wikipedia",
+        "URL": ""
+      }
+    ]
+  },
+  "Issues": [
+    {
+      "SeriesName": "Star Wars: The High Republic",
+      "SeriesStartYear": "2021",
+      "IssueNum": "1",
+      "IssueType": "Event / Event Tie-In / Event One-Shot / Ongoing Series",
+      "Notes": "Info on why I decided to include this issue here",
+      "CoverDate": "2021-01-07",
+      "Databases": [
+        {
+          "Name": "Comicvine",
+          "SeriesID": 133079,
+          "IssueID": 824020
+        },
+        {
+          "Name": "Grand Comics Database",
+          "SeriesID": 190281,
+          "IssueID": 2438516
+        }
+      ]
+    },
+    {
+      "SeriesName": "Star Wars: The High Republic",
+      "SeriesStartYear": "2021",
+      "IssueNum": "2",
+      "IssueType": "Event / Event Tie-In / Event One-Shot / Ongoing Series",
+      "Notes": "Info on why I decided to include this issue here",
+      "CoverDate": "2021-01-07",
+      "Databases": [
+        {
+          "Name": "Comicvine",
+          "SeriesID": 133079,
+          "IssueID": 824020
+        },
+        {
+          "Name": "Grand Comics Database",
+          "SeriesID": 190281,
+          "IssueID": 2438516
+        }
+      ]
+    }
+  ]
+}

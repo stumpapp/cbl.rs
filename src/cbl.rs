@@ -1,5 +1,7 @@
 use serde::Deserialize;
 
+use crate::{common::negative_default_i32, error::CLIError};
+
 // TODO: find out what version I have been working with, create an enum for the supported versions
 // that we can source from for converting to JSON
 
@@ -16,8 +18,11 @@ pub struct CBL {
     items: ComicReadingListItems,
 }
 
-fn negative_default() -> i32 {
-    -1
+impl CBL {
+    pub fn from_file(file: &std::path::Path) -> Result<Self, CLIError> {
+        let file = std::fs::File::open(file).map_err(|_| CLIError::FileNotFound)?;
+        serde_xml_rs::from_reader(file).map_err(|e| CLIError::InvalidCBL(e.to_string()))
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -36,9 +41,9 @@ pub struct ComicReadingListItemBook {
     series: String,
     #[serde(alias = "Number", default)]
     number: String,
-    #[serde(alias = "Volume", default = "negative_default")]
+    #[serde(alias = "Volume", default = "negative_default_i32")]
     volume: i32,
-    #[serde(alias = "Year", default = "negative_default")]
+    #[serde(alias = "Year", default = "negative_default_i32")]
     year: i32,
     #[serde(alias = "Format", default)]
     format: String,

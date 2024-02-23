@@ -57,6 +57,7 @@ dependencies = [
  "clap",
  "serde",
  "serde-xml-rs",
+ "thiserror",
 ]
 
 [[package]]

@@ -1,14 +1,20 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-use crate::common::negative_default_i32;
+use crate::{cbl::CBL, common::negative_default_i32};
 
 pub const VERSION: &str = "1.0-draft";
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct DraftSpec {
+    /// The details of the CBL file, including its version and unique identifier
     file_details: FileDetails,
+    /// The details of the reading list, including its name, description, publisher, and
+    /// other metadata
     list_details: ListDetails,
+    /// The actual issues in the reading list
+    issues: Vec<ListIssue>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -48,7 +54,7 @@ pub struct ListDetails {
     r#type: String,
     /// Associated information about the reading list, e.g. characters, teams
     #[serde(default)]
-    associated: ListAssociations,
+    associated: Option<ListAssociations>,
     /// URLs for valid cover images for the reading list
     #[serde(rename = "CoverImageURLs", default)]
     cover_image_urls: Vec<String>,
@@ -98,7 +104,9 @@ pub struct ListIssue {
     #[serde(default = "negative_default_i32")]
     series_start_year: i32,
     /// The sequence number of the issue in the series
-    issue_num: i32,
+    ///
+    /// Note: this is a string because some issue numbers are alphanumeric, e.g. "1.HU"
+    issue_num: String,
     /// The type of issue, e.g. "Event", "Event Tie-In", "Ongoing Series"
     issue_type: String,
     /// Additional information about the issue and/or its inclusion in the reading list
@@ -119,7 +127,79 @@ pub struct Database {
     pub name: String,
     /// The unique identifier of the series in the database which the [ListIssue]
     /// belongs to
-    pub series_id: i32,
+    ///
+    /// Note: this is a string because some identifiers are alphanumeric
+    pub series_id: String,
     /// The unique identifier of the [ListIssue] in the database
-    pub issue_id: i32,
+    ///
+    /// Note: this is a string because some identifiers are alphanumeric
+    pub issue_id: String,
+}
+
+impl From<CBL> for DraftSpec {
+    fn from(value: CBL) -> Self {
+        let min_year = value
+            .items
+            .books
+            .iter()
+            .map(|b| b.year)
+            .min()
+            .unwrap_or(negative_default_i32());
+
+        let max_year = value
+            .items
+            .books
+            .iter()
+            .map(|b| b.year)
+            .max()
+            .unwrap_or(negative_default_i32());
+
+        DraftSpec {
+            file_details: FileDetails {
+                version: VERSION.to_string(),
+                // TODO: I assume this is fine, there is no unique ID in the CBL so when we convert it we will generate one ONCE
+                // future versions will be operating on converting between spec versions, not CBL, so won't be generating unique IDs
+                unique_id: Uuid::new_v4().to_string(),
+            },
+            list_details: ListDetails {
+                name: value.name,
+                description: None,            // TODO: where to get this?
+                publisher: String::default(), // TODO: where to get this?
+                imprint: String::default(),   // TODO: where to get this?
+                start_year: min_year,
+                end_year: max_year,
+                r#type: String::default(), // TODO: where to get this?
+                // associated: ListAssociations { // TODO: where to get this?
+                //     characters: value.associated_characters,
+                //     teams: value.associated_teams,
+                // },
+                associated: None,         // TODO: where to get this?
+                cover_image_urls: vec![], // TODO: where to get this?
+                relationships: None,      // TODO: where to get this?
+            },
+            issues: value
+                .items
+                .books
+                .into_iter()
+                .map(|i| ListIssue {
+                    series_name: i.series,
+                    series_start_year: i.year, // TODO: Not sure this is correct
+                    issue_num: i.number,
+                    issue_type: String::default(), // TODO: where to get this?
+                    notes: None,
+                    cover_date: String::default(), // TODO: where to get this?
+                    databases: i
+                        .database
+                        .map(|d| {
+                            vec![Database {
+                                name: d.name,
+                                series_id: d.series,
+                                issue_id: d.issue,
+                            }]
+                        })
+                        .unwrap_or_default(),
+                })
+                .collect(),
+        }
+    }
 }

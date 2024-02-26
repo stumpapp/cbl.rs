@@ -11,11 +11,11 @@ use crate::{common::negative_default_i32, error::CLIError};
 #[derive(Debug, Deserialize)]
 pub struct CBL {
     #[serde(alias = "Name")]
-    name: String,
+    pub name: String,
     #[serde(alias = "NumIssues")]
-    num_issues: i32,
+    pub num_issues: i32,
     #[serde(alias = "Books")]
-    items: ComicReadingListItems,
+    pub items: ComicReadingListItems,
 }
 
 impl CBL {
@@ -28,37 +28,37 @@ impl CBL {
 #[derive(Debug, Deserialize)]
 pub struct ComicReadingListItems {
     #[serde(alias = "Book", rename = "$value")]
-    books: Vec<ComicReadingListItemBook>,
+    pub books: Vec<ComicReadingListItemBook>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct ComicReadingListItemBook {
     #[serde(alias = "Id", default)]
-    id: String,
+    pub id: String,
     #[serde(alias = "FileName", default)]
-    file_name: String,
+    pub file_name: String,
     #[serde(alias = "Series", default)]
-    series: String,
+    pub series: String,
     #[serde(alias = "Number", default)]
-    number: String,
+    pub number: String,
     #[serde(alias = "Volume", default = "negative_default_i32")]
-    volume: i32,
+    pub volume: i32,
     #[serde(alias = "Year", default = "negative_default_i32")]
-    year: i32,
+    pub year: i32,
     #[serde(alias = "Format", default)]
-    format: String,
+    pub format: String,
     #[serde(alias = "Database", default)]
-    database: Option<ComicReadingListItemBookDatabase>,
+    pub database: Option<ComicReadingListItemBookDatabase>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct ComicReadingListItemBookDatabase {
     #[serde(alias = "Name")]
-    name: String,
+    pub name: String,
     #[serde(alias = "Series")]
-    series: String,
+    pub series: String,
     #[serde(alias = "Issue")]
-    issue: String,
+    pub issue: String,
 }
 
 #[cfg(test)]

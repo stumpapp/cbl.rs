@@ -1,8 +1,14 @@
+use std::fs::File;
+use std::io::Write;
 use std::path::PathBuf;
+use std::time::Duration;
+use std::time::Instant;
 
 use cbl::CBL;
 use clap::Parser;
 use error::CLIResult;
+use indicatif::ProgressBar;
+use indicatif::ProgressStyle;
 use specs::SpecVersion;
 
 mod cbl;
@@ -11,6 +17,8 @@ mod error;
 mod specs;
 
 use specs::CURRENT_SPEC_VERSION;
+
+use crate::specs::convert;
 
 // TODO: https://github.com/Keats/validator would be useful
 
@@ -57,13 +65,39 @@ fn main() -> CLIResult<()> {
                 std::process::exit(1);
             }
 
+            let progress_bar = default_progress_spinner();
+            progress_bar.set_message("Loading CBL file");
+
             let cbl = CBL::from_file(&file)?;
 
-            println!("{:?}", cbl);
+            // println!("{:?}", cbl);
+            // println!("Spec version to convert to: {:}", spec_version.to_string());
 
-            println!("Spec version to convert to: {:}", spec_version.to_string());
+            progress_bar.set_message(format!(
+                "Converting CBL to {} spec",
+                spec_version.to_string()
+            ));
+
+            let start = Instant::now();
+            let json_string = convert(cbl, spec_version);
+            let duration = start.elapsed();
+
+            progress_bar.finish_with_message(format!("Conversion complete in {:?}", duration));
+
+            File::create("output.json")?.write_all(json_string.as_bytes())?;
         }
     }
 
     Ok(())
+}
+
+pub(crate) fn default_progress_spinner() -> ProgressBar {
+    let progress = ProgressBar::new_spinner();
+    progress.enable_steady_tick(Duration::from_millis(120));
+    progress.set_style(
+        ProgressStyle::with_template("{spinner} {msg}")
+            .unwrap()
+            .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]),
+    );
+    progress
 }
